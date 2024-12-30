@@ -80,7 +80,7 @@ public class ShortLinkService {
      * - Истечение срока действия (expiryTime).
      * - Превышение лимита переходов (currentCount >= limit).
      *
-     * Если ссылка недоступна по одной из причин, бросается исключение.
+     * Если ссылка недоступна по одной из причин, уведомляет пользователя и бросает исключение.
      *
      * @param shortId короткий идентификатор ссылки
      * @return объект ShortLink, содержащий оригинальную ссылку
@@ -93,18 +93,21 @@ public class ShortLinkService {
         // Ищем ссылку в репозитории
         ShortLink link = shortLinkRepository.findByShortId(shortId);
 
-        // Если не нашли, бросаем исключение
+        // Если не нашли, уведомляем пользователя и бросаем исключение
         if (link == null) {
+            notifyUser("Ссылка с идентификатором " + shortId + " не найдена.");
             throw new RuntimeException("Короткая ссылка не найдена");
         }
 
         // Проверяем срок действия ссылки
         if (System.currentTimeMillis() > link.getExpiryTime()) {
+            notifyUser("Срок действия ссылки с идентификатором " + shortId + " истёк.");
             throw new RuntimeException("Срок действия короткой ссылки истек");
         }
 
         // Проверяем лимит переходов
         if (link.getCurrentCount() >= link.getLimit()) {
+            notifyUser("Ссылка с идентификатором " + shortId + " превысила лимит переходов.");
             throw new RuntimeException("Количество коротких ссылок превысило установленный лимит");
         }
 
@@ -147,6 +150,15 @@ public class ShortLinkService {
     }
 
     /**
+     * Уведомляет пользователя о состоянии ссылки.
+     *
+     * @param message текст сообщения для вывода в консоль
+     */
+    private void notifyUser(String message) {
+        System.out.println("Уведомление пользователя: " + message);
+    }
+
+    /**
      * Открывает указанную ссылку в браузере.
      *
      * @param url оригинальный URL для открытия
@@ -155,9 +167,9 @@ public class ShortLinkService {
         if (Desktop.isDesktopSupported()) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
-                System.out.println("Открыта ссылка: " + url);
+                System.out.println("Ссылка открыта в браузере: " + url);
             } catch (IOException | URISyntaxException e) {
-                System.err.println("Ошибка при попытке открыть ссылку в браузере: " + e.getMessage());
+                System.err.println("Ошибка при попытке открыть ссылку: " + e.getMessage());
             }
         } else {
             System.err.println("Операция Desktop не поддерживается на данной системе.");

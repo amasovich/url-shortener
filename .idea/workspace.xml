@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Edit cleanUpExpiredLink method (limit check)">
+    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="UPD getOriginalUrl method / Create openInBrowser method in ShortLinkService class">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkService.java" afterDir="false" />
     </list>
@@ -208,7 +208,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735586087468</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="UPD getOriginalUrl method / Create openInBrowser method in ShortLinkService class">
+      <option name="closed" value="true" />
+      <created>1735586555714</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1735586555714</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -237,6 +245,7 @@
     <MESSAGE value="Create Cohfig class and properties for application. Change createShortLink method" />
     <MESSAGE value="Add cleanUpExpiredLinks method in ShortLinkService class" />
     <MESSAGE value="Edit cleanUpExpiredLink method (limit check)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Edit cleanUpExpiredLink method (limit check)" />
+    <MESSAGE value="UPD getOriginalUrl method / Create openInBrowser method in ShortLinkService class" />
+    <option name="LAST_COMMIT_MESSAGE" value="UPD getOriginalUrl method / Create openInBrowser method in ShortLinkService class" />
   </component>
 </project>
