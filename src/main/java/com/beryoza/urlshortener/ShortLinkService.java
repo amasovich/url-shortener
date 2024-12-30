@@ -195,4 +195,45 @@ public class ShortLinkService {
 
         return shortId.toString();
     }
+
+    /**
+     * Изменяет лимит переходов для существующей короткой ссылки.
+     *
+     * @param shortId  идентификатор короткой ссылки
+     * @param newLimit новый лимит переходов
+     * @param userUuid UUID пользователя, инициировавшего запрос
+     * @throws RuntimeException если ссылка не найдена, пользователь не имеет доступа или новый лимит недопустим
+     */
+    public void editRedirectLimit(String shortId, int newLimit, UUID userUuid) {
+        // Ищем ссылку в репозитории
+        ShortLink link = shortLinkRepository.findByShortId(shortId);
+
+        // Если ссылка не найдена, бросаем исключение
+        if (link == null) {
+            notifyUser("Ссылка с идентификатором " + shortId + " не найдена.");
+            throw new RuntimeException("Короткая ссылка не найдена");
+        }
+
+        // Проверяем права доступа
+        if (!link.getUserUuid().equals(userUuid)) {
+            notifyUser("Пользователь с UUID " + userUuid + " не имеет прав на изменение ссылки с идентификатором " + shortId + ".");
+            throw new RuntimeException("Нет доступа к изменению лимита переходов");
+        }
+
+        // Проверяем новый лимит на соответствие системным ограничениям
+        int adjustedLimit = Math.min(Config.getMaxLimit(), Math.max(Config.getMinLimit(), newLimit));
+        if (adjustedLimit != newLimit) {
+            notifyUser("Указанный лимит " + newLimit + " был скорректирован до " + adjustedLimit + " в соответствии с системными ограничениями.");
+        }
+
+        // Устанавливаем новый лимит
+        link.setLimit(adjustedLimit);
+
+        // Сохраняем обновлённую ссылку в репозитории
+        shortLinkRepository.save(link);
+
+        // Уведомляем пользователя об успешном изменении
+        notifyUser("Лимит переходов для ссылки с идентификатором " + shortId + " успешно изменён на " + adjustedLimit + ".");
+    }
+
 }
