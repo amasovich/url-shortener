@@ -266,4 +266,48 @@ public class ShortLinkService {
         notifyUser("Ссылка с идентификатором " + shortId + " успешно удалена.");
     }
 
+    /**
+     * Изменяет время жизни короткой ссылки.
+     *
+     * @param shortId  идентификатор короткой ссылки
+     * @param newTTL   новый срок действия в часах
+     * @param userUuid UUID пользователя, инициировавшего запрос
+     * @throws RuntimeException если ссылка не найдена, пользователь не имеет прав или новый срок недопустим
+     */
+    public void editExpiryTime(String shortId, int newTTL, UUID userUuid) {
+        // Ищем ссылку в репозитории
+        ShortLink link = shortLinkRepository.findByShortId(shortId);
+
+        // Если ссылка не найдена, бросаем исключение
+        if (link == null) {
+            notifyUser("Ссылка с идентификатором " + shortId + " не найдена.");
+            throw new RuntimeException("Короткая ссылка не найдена");
+        }
+
+        // Проверяем права доступа
+        if (!link.getUserUuid().equals(userUuid)) {
+            notifyUser("Пользователь с UUID " + userUuid + " не имеет прав на изменение ссылки с идентификатором " + shortId + ".");
+            throw new RuntimeException("Нет доступа к изменению времени жизни ссылки");
+        }
+
+        // Получаем системные ограничения
+        int maxTTL = Config.getMaxTtl();
+        int minTTL = Config.getMinTtl();
+
+        // Проверяем новый срок действия
+        int adjustedTTL = Math.min(maxTTL, Math.max(minTTL, newTTL));
+        if (adjustedTTL != newTTL) {
+            notifyUser("Указанный срок действия " + newTTL + " часов был скорректирован до " + adjustedTTL + " в соответствии с системными ограничениями (" + minTTL + "-" + maxTTL + " часов).");
+        }
+
+        // Устанавливаем новый срок действия
+        link.setExpiryTime(System.currentTimeMillis() + adjustedTTL * 3600000L);
+
+        // Сохраняем обновлённую ссылку в репозитории
+        shortLinkRepository.save(link);
+
+        // Уведомляем пользователя об успешном изменении
+        notifyUser("Время жизни ссылки с идентификатором " + shortId + " успешно изменено на " + adjustedTTL + " часов.");
+    }
+
 }
