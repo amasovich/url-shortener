@@ -236,4 +236,34 @@ public class ShortLinkService {
         notifyUser("Лимит переходов для ссылки с идентификатором " + shortId + " успешно изменён на " + adjustedLimit + ".");
     }
 
+    /**
+     * Удаляет короткую ссылку по её идентификатору.
+     *
+     * @param shortId  идентификатор короткой ссылки
+     * @param userUuid UUID пользователя, инициировавшего запрос
+     * @throws RuntimeException если ссылка не найдена или пользователь не имеет прав на удаление
+     */
+    public void deleteShortLink(String shortId, UUID userUuid) {
+        // Ищем ссылку в репозитории
+        ShortLink link = shortLinkRepository.findByShortId(shortId);
+
+        // Если ссылка не найдена, бросаем исключение
+        if (link == null) {
+            notifyUser("Ссылка с идентификатором " + shortId + " не найдена.");
+            throw new RuntimeException("Короткая ссылка не найдена");
+        }
+
+        // Проверяем права доступа
+        if (!link.getUserUuid().equals(userUuid)) {
+            notifyUser("Пользователь с UUID " + userUuid + " не имеет прав на удаление ссылки с идентификатором " + shortId + ".");
+            throw new RuntimeException("Нет доступа к удалению ссылки");
+        }
+
+        // Удаляем ссылку из репозитория
+        shortLinkRepository.deleteByShortId(shortId);
+
+        // Уведомляем пользователя об успешном удалении
+        notifyUser("Ссылка с идентификатором " + shortId + " успешно удалена.");
+    }
+
 }
