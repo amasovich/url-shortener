@@ -35,11 +35,17 @@ public class ShortLinkService {
      * @return уникальный идентификатор короткой ссылки (shortId)
      */
     public String createShortLink(String originalUrl, UUID userUuid, int userTTL, int userLimit) {
+        // Проверяем TTL, чтобы он укладывался в системные пределы
+        int finalTtl = Math.min(Config.getMaxTtl(), Math.max(Config.getMinTtl(), userTTL));
+
+        // Проверяем лимит переходов, чтобы он укладывался в системные пределы
+        int finalLimit = Math.min(Config.getMaxLimit(), Math.max(Config.getMinLimit(), userLimit));
+
         // Сгенерировать уникальный shortId
         String shortId = generateShortId();
 
-        // Рассчитать время истечения ссылки (в миллисекундах)
-        long expiryTime = System.currentTimeMillis() + (userTTL * 3600000L);
+        // Рассчитать время истечения ссылки
+        long expiryTime = System.currentTimeMillis() + (finalTtl * 3600000L);
 
         // Создать объект ShortLink
         ShortLink link = new ShortLink(
@@ -47,8 +53,8 @@ public class ShortLinkService {
                 originalUrl,
                 System.currentTimeMillis(),
                 expiryTime,
-                userLimit,
-                0, // Счётчик переходов начинается с 0
+                finalLimit,
+                0,
                 userUuid
         );
 
