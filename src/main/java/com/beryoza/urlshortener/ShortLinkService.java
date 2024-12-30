@@ -70,18 +70,20 @@ public class ShortLinkService {
     }
 
     /**
-     * Получает оригинальную ссылку по её короткому идентификатору.
+     * Возвращает оригинальную ссылку по её короткому идентификатору (shortId).
      *
-     * Перед возвращением проверяет:
-     * - Срок действия (если истёк — ссылка недоступна).
-     * - Лимит переходов (если превышен — ссылка недоступна).
+     * Перед возвращением ссылка проверяется на:
+     * - Истечение срока действия (expiryTime).
+     * - Превышение лимита переходов (currentCount >= limit).
+     *
+     * Если ссылка недоступна по одной из причин, бросается исключение.
      *
      * @param shortId короткий идентификатор ссылки
      * @return объект ShortLink, содержащий оригинальную ссылку
-     * @throws RuntimeException если ссылка не найдена, истекла или превышен лимит
+     * @throws RuntimeException если ссылка недоступна или не найдена
      */
     public ShortLink getOriginalUrl(String shortId) {
-        // Очищаем устаревшие ссылки
+        // Очищаем устаревшие или исчерпанные ссылки
         cleanUpExpiredLinks();
 
         // Ищем ссылку в репозитории
@@ -89,17 +91,17 @@ public class ShortLinkService {
 
         // Если не нашли, бросаем исключение
         if (link == null) {
-            throw new RuntimeException("ShortLink not found");
+            throw new RuntimeException("Короткая ссылка не найдена");
         }
 
         // Проверяем срок действия ссылки
         if (System.currentTimeMillis() > link.getExpiryTime()) {
-            throw new RuntimeException("ShortLink has expired");
+            throw new RuntimeException("Срок действия короткой ссылки истек");
         }
 
         // Проверяем лимит переходов
         if (link.getCurrentCount() >= link.getLimit()) {
-            throw new RuntimeException("ShortLink has exceeded its limit");
+            throw new RuntimeException("Количество коротких ссылок превысило установленный лимит");
         }
 
         // Увеличиваем счётчик переходов
@@ -110,7 +112,14 @@ public class ShortLinkService {
     }
 
     /**
-     * Удаляет все ссылки, срок действия которых истёк.
+     * Удаляет все ссылки, которые больше не должны быть доступны.
+     *
+     * Это включает:
+     * - Ссылки с истёкшим сроком действия (expiryTime).
+     * - Ссылки, у которых превышен лимит переходов (currentCount >= limit).
+     *
+     * Каждая удалённая ссылка будет указана в консоли с причиной удаления
+     * (просрочена или достигнут лимит переходов).
      */
     public void cleanUpExpiredLinks() {
         // Получаем все ссылки из репозитория
@@ -118,11 +127,14 @@ public class ShortLinkService {
 
         while (iterator.hasNext()) {
             ShortLink link = iterator.next();
+            boolean isExpired = System.currentTimeMillis() > link.getExpiryTime();
+            boolean isLimitExceeded = link.getCurrentCount() >= link.getLimit();
 
-            // Если срок действия истёк, удаляем ссылку
-            if (System.currentTimeMillis() > link.getExpiryTime()) {
+            // Если срок действия истёк или лимит переходов превышен, удаляем ссылку
+            if (isExpired || isLimitExceeded) {
                 shortLinkRepository.deleteByShortId(link.getShortId());
-                System.out.println("Удалена ссылка с shortId: " + link.getShortId() + " (просрочена)");
+                System.out.println("Удалена ссылка с shortId: " + link.getShortId() +
+                        (isExpired ? " (просрочена)" : " (достигнут лимит переходов)"));
             }
         }
     }
