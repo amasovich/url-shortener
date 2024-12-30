@@ -1,8 +1,6 @@
 package com.beryoza.urlshortener;
 
-import java.util.Random;
-import java.util.UUID;
-import java.util.Iterator;
+import java.util.*;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
@@ -43,17 +41,29 @@ public class ShortLinkService {
         // Очищаем устаревшие ссылки
         cleanUpExpiredLinks();
 
-        // Проверяем TTL, чтобы он укладывался в системные пределы
-        int finalTtl = Math.min(Config.getMaxTtl(), Math.max(Config.getMinTtl(), userTTL));
+        // Проверяем входные данные
+        if (originalUrl == null || originalUrl.isEmpty()) {
+            throw new IllegalArgumentException("URL не может быть пустым");
+        }
+        if (userUuid == null) {
+            throw new IllegalArgumentException("UUID пользователя не может быть null");
+        }
 
-        // Проверяем лимит переходов, чтобы он укладывался в системные пределы
+        // Проверяем TTL и лимит переходов
+        int finalTtl = Math.min(Config.getMaxTtl(), Math.max(Config.getMinTtl(), userTTL));
         int finalLimit = Math.min(Config.getMaxLimit(), Math.max(Config.getMinLimit(), userLimit));
 
         // Сгенерировать уникальный shortId
         String shortId = generateShortId();
 
         // Рассчитать время истечения ссылки
-        long expiryTime = System.currentTimeMillis() + (finalTtl * 3600000L);
+        //long expiryTime = System.currentTimeMillis() + (finalTtl * 3600000L);
+        long expiryTime = System.currentTimeMillis() + Math.max(1, finalTtl * 3600000L);
+
+        // Логгирование
+        System.out.println("Создаётся ссылка с shortId: " + shortId);
+        System.out.println("TTL: " + finalTtl + " часов, лимит: " + finalLimit);
+        System.out.println("Время истечения: " + expiryTime);
 
         // Создать объект ShortLink
         ShortLink link = new ShortLink(
@@ -69,7 +79,7 @@ public class ShortLinkService {
         // Сохранить ссылку в репозитории
         shortLinkRepository.save(link);
 
-        // Вернуть shortId пользователю
+        // Возвратить shortId
         return shortId;
     }
 
@@ -87,32 +97,40 @@ public class ShortLinkService {
      * @throws RuntimeException если ссылка недоступна или не найдена
      */
     public ShortLink getOriginalUrl(String shortId) {
-        // Очищаем устаревшие или исчерпанные ссылки
-        cleanUpExpiredLinks();
 
         // Ищем ссылку в репозитории
         ShortLink link = shortLinkRepository.findByShortId(shortId);
 
         // Если не нашли, уведомляем пользователя и бросаем исключение
         if (link == null) {
+            System.out.println("Ссылка не найдена");
             notifyUser("Ссылка с идентификатором " + shortId + " не найдена.");
-            throw new RuntimeException("Короткая ссылка не найдена");
+            throw new RuntimeException("Ссылка с идентификатором " + shortId + " не найдена.");
         }
 
         // Проверяем срок действия ссылки
+        System.out.println("Текущая метка времени: " + System.currentTimeMillis());
+        System.out.println("Время истечения: " + link.getExpiryTime());
         if (System.currentTimeMillis() > link.getExpiryTime()) {
             notifyUser("Срок действия ссылки с идентификатором " + shortId + " истёк.");
             throw new RuntimeException("Срок действия короткой ссылки истек");
         }
 
         // Проверяем лимит переходов
+        System.out.println("Текущий счётчик: " + link.getCurrentCount());
+        System.out.println("Лимит переходов: " + link.getLimit());
         if (link.getCurrentCount() >= link.getLimit()) {
             notifyUser("Ссылка с идентификатором " + shortId + " превысила лимит переходов.");
             throw new RuntimeException("Количество коротких ссылок превысило установленный лимит");
         }
 
+        System.out.println("Очищаем устаревшие ссылки");
+        // Очищаем устаревшие или исчерпанные ссылки
+        cleanUpExpiredLinks();
+
         // Увеличиваем счётчик переходов
         link.setCurrentCount(link.getCurrentCount() + 1);
+        System.out.println("Счётчик обновлён: " + link.getCurrentCount());
 
         // Открываем ссылку в браузере
         openInBrowser(link.getOriginalUrl());
@@ -131,7 +149,7 @@ public class ShortLinkService {
      * Каждая удалённая ссылка будет указана в консоли с причиной удаления
      * (просрочена или достигнут лимит переходов).
      */
-    public void cleanUpExpiredLinks() {
+    /** public void cleanUpExpiredLinks() {
         // Получаем все ссылки из репозитория
         Iterator<ShortLink> iterator = shortLinkRepository.findAll().iterator();
 
@@ -145,6 +163,22 @@ public class ShortLinkService {
                 shortLinkRepository.deleteByShortId(link.getShortId());
                 System.out.println("Удалена ссылка с shortId: " + link.getShortId() +
                         (isExpired ? " (просрочена)" : " (достигнут лимит переходов)"));
+            }
+        }
+    } **/
+    public void cleanUpExpiredLinks() {
+        // Преобразуем коллекцию в список
+        List<ShortLink> allLinks = new ArrayList<>(shortLinkRepository.findAll());
+        long currentTime = System.currentTimeMillis();
+
+        for (ShortLink link : allLinks) {
+            if (currentTime > link.getExpiryTime() || link.getCurrentCount() >= link.getLimit()) {
+                // Уведомляем пользователя об удалении
+                notifyUser("Удалена ссылка с идентификатором " + link.getShortId() +
+                        (currentTime > link.getExpiryTime() ? " (истёк срок действия)." : " (достигнут лимит переходов)."));
+
+                // Удаляем ссылку
+                shortLinkRepository.deleteByShortId(link.getShortId());
             }
         }
     }
@@ -244,6 +278,11 @@ public class ShortLinkService {
      * @throws RuntimeException если ссылка не найдена или пользователь не имеет прав на удаление
      */
     public void deleteShortLink(String shortId, UUID userUuid) {
+        // Проверяем, что userUuid не null
+        if (userUuid == null) {
+            throw new IllegalArgumentException("UUID пользователя не может быть null");
+        }
+
         // Ищем ссылку в репозитории
         ShortLink link = shortLinkRepository.findByShortId(shortId);
 

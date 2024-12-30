@@ -1,7 +1,7 @@
 package com.beryoza.urlshortener;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -11,29 +11,32 @@ public class Config {
     private static final Properties properties = new Properties();
 
     static {
-        try (InputStream input = Config.class.getClassLoader().getResourceAsStream("application.properties")) {
-            if (input == null) {
-                throw new RuntimeException("Конфигурационный файл не найден!");
+        try {
+            String env = System.getProperty("env", "default");
+            String configFileName = "config.properties";
+            if ("test".equals(env)) {
+                configFileName = "testconfig.properties";
             }
-            properties.load(input);
-        } catch (IOException e) {
-            throw new RuntimeException("Не удалось загрузить конфигурационный файл!", e);
+            // Загружаем файл из classpath
+            properties.load(Config.class.getClassLoader().getResourceAsStream(configFileName));
+        } catch (IOException | NullPointerException e) {
+            throw new RuntimeException("Не удалось загрузить конфигурационный файл", e);
         }
     }
 
     public static int getMinTtl() {
-        return Integer.parseInt(properties.getProperty("config.ttl.min", "1")); // Значение по умолчанию: 1 час
+        return Integer.parseInt(properties.getProperty("config.ttl.min", "1"));
     }
 
     public static int getMaxTtl() {
-        return Integer.parseInt(properties.getProperty("config.ttl.max", "48")); // Значение по умолчанию: 48 часов
+        return Integer.parseInt(properties.getProperty("config.ttl.max", "48"));
     }
 
     public static int getMinLimit() {
-        return Integer.parseInt(properties.getProperty("config.limit.min", "1")); // Значение по умолчанию: 1 переход
+        return Integer.parseInt(properties.getProperty("config.limit.min", "1"));
     }
 
     public static int getMaxLimit() {
-        return Integer.parseInt(properties.getProperty("config.limit.max", "100")); // Значение по умолчанию: 100 переходов
+        return Integer.parseInt(properties.getProperty("config.limit.max", "100"));
     }
 }
