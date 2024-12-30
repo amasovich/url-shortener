@@ -10,7 +10,7 @@
 
   <name>url-shortener</name>
   <!-- FIXME change it to the project's website -->
-  <url>https://github.com/amasovich/url-shortener</url>
+  <url>https://github.com/amasovich/url-shortener.git</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
