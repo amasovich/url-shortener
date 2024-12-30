@@ -3,6 +3,10 @@ package com.beryoza.urlshortener;
 import java.util.Random;
 import java.util.UUID;
 import java.util.Iterator;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Сервис для управления короткими ссылками.
@@ -107,6 +111,9 @@ public class ShortLinkService {
         // Увеличиваем счётчик переходов
         link.setCurrentCount(link.getCurrentCount() + 1);
 
+        // Открываем ссылку в браузере
+        openInBrowser(link.getOriginalUrl());
+
         // Возвращаем найденную ссылку
         return link;
     }
@@ -136,6 +143,24 @@ public class ShortLinkService {
                 System.out.println("Удалена ссылка с shortId: " + link.getShortId() +
                         (isExpired ? " (просрочена)" : " (достигнут лимит переходов)"));
             }
+        }
+    }
+
+    /**
+     * Открывает указанную ссылку в браузере.
+     *
+     * @param url оригинальный URL для открытия
+     */
+    private void openInBrowser(String url) {
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().browse(new URI(url));
+                System.out.println("Открыта ссылка: " + url);
+            } catch (IOException | URISyntaxException e) {
+                System.err.println("Ошибка при попытке открыть ссылку в браузере: " + e.getMessage());
+            }
+        } else {
+            System.err.println("Операция Desktop не поддерживается на данной системе.");
         }
     }
 
