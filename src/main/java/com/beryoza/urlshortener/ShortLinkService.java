@@ -2,6 +2,7 @@ package com.beryoza.urlshortener;
 
 import java.util.Random;
 import java.util.UUID;
+import java.util.Iterator;
 
 /**
  * Сервис для управления короткими ссылками.
@@ -35,6 +36,9 @@ public class ShortLinkService {
      * @return уникальный идентификатор короткой ссылки (shortId)
      */
     public String createShortLink(String originalUrl, UUID userUuid, int userTTL, int userLimit) {
+        // Очищаем устаревшие ссылки
+        cleanUpExpiredLinks();
+
         // Проверяем TTL, чтобы он укладывался в системные пределы
         int finalTtl = Math.min(Config.getMaxTtl(), Math.max(Config.getMinTtl(), userTTL));
 
@@ -77,6 +81,9 @@ public class ShortLinkService {
      * @throws RuntimeException если ссылка не найдена, истекла или превышен лимит
      */
     public ShortLink getOriginalUrl(String shortId) {
+        // Очищаем устаревшие ссылки
+        cleanUpExpiredLinks();
+
         // Ищем ссылку в репозитории
         ShortLink link = shortLinkRepository.findByShortId(shortId);
 
@@ -100,6 +107,24 @@ public class ShortLinkService {
 
         // Возвращаем найденную ссылку
         return link;
+    }
+
+    /**
+     * Удаляет все ссылки, срок действия которых истёк.
+     */
+    public void cleanUpExpiredLinks() {
+        // Получаем все ссылки из репозитория
+        Iterator<ShortLink> iterator = shortLinkRepository.findAll().iterator();
+
+        while (iterator.hasNext()) {
+            ShortLink link = iterator.next();
+
+            // Если срок действия истёк, удаляем ссылку
+            if (System.currentTimeMillis() > link.getExpiryTime()) {
+                shortLinkRepository.deleteByShortId(link.getShortId());
+                System.out.println("Удалена ссылка с shortId: " + link.getShortId() + " (просрочена)");
+            }
+        }
     }
 
     /**

@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Adding a prepared class UserService &amp; ShortLinkService v3">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/Config.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Create Cohfig class and properties for application. Change createShortLink method">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkService.java" afterDir="false" />
     </list>
@@ -186,7 +184,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735583548709</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Create Cohfig class and properties for application. Change createShortLink method">
+      <option name="closed" value="true" />
+      <created>1735584637368</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1735584637368</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -212,6 +218,7 @@
     <MESSAGE value="Adding a prepared class ShortLinkRepository" />
     <MESSAGE value="Adding a prepared class UserService" />
     <MESSAGE value="Adding a prepared class UserService &amp; ShortLinkService v3" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding a prepared class UserService &amp; ShortLinkService v3" />
+    <MESSAGE value="Create Cohfig class and properties for application. Change createShortLink method" />
+    <option name="LAST_COMMIT_MESSAGE" value="Create Cohfig class and properties for application. Change createShortLink method" />
   </component>
 </project>
