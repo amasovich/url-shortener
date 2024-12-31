@@ -140,9 +140,6 @@ public class ShortLinkService {
         // Сохраняем изменения
         shortLinkRepository.save(link);
 
-        // Открываем ссылку в браузере
-        openInBrowser(link.getOriginalUrl());
-
         // Возвращаем найденную ссылку
         return link;
     }
