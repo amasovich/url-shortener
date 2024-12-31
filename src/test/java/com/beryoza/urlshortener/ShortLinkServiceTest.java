@@ -8,11 +8,19 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Тесты по ТЗ.
+ * Проверяются ключевые функции сокращения ссылок, управления лимитами и временем жизни.
+ */
 public class ShortLinkServiceTest {
 
     private ShortLinkService shortLinkService;
     private ShortLinkRepository shortLinkRepository;
 
+    /**
+     * Инициализация перед каждым тестом.
+     * Создаются объекты репозитория и сервиса, а также очищаются уведомления.
+     */
     @BeforeEach
     public void setUp() {
         shortLinkRepository = new ShortLinkRepository();
@@ -20,6 +28,10 @@ public class ShortLinkServiceTest {
         shortLinkService.clearNotifications(); // Очищаем уведомления перед каждым тестом
     }
 
+    /**
+     * Проверяет, что сокращённые ссылки уникальны для разных пользователей,
+     * даже если оригинальный URL совпадает.
+     */
     @Test
     public void testUniqueShortLinksForDifferentUsers() {
         String originalUrl = "https://vk.com/amasovich";
@@ -32,6 +44,9 @@ public class ShortLinkServiceTest {
         assertNotEquals(shortId1, shortId2, "Сокращённые ссылки для разных пользователей должны быть уникальными.");
     }
 
+    /**
+     * Проверяет, что ссылка блокируется при превышении лимита переходов.
+     */
     @Test
     public void testLimitExceedBlocksLink() {
         String originalUrl = "https://vk.com/amasovich";
@@ -48,6 +63,9 @@ public class ShortLinkServiceTest {
                 "Ссылка должна блокироваться при превышении лимита переходов.");
     }
 
+    /**
+     * Проверяет, что ссылка удаляется после истечения срока действия.
+     */
     @Test
     public void testExpiryTimeRemovesLink() {
         String originalUrl = "https://vk.com/amasovich";
@@ -66,6 +84,10 @@ public class ShortLinkServiceTest {
         assertNull(shortLinkRepository.findByShortId(shortId), "Ссылка должна быть удалена после истечения срока.");
     }
 
+    /**
+     * Проверяет уведомления о блокировке ссылки при превышении лимита переходов
+     * и истечении срока действия.
+     */
     @Test
     public void testNotificationOnBlockedOrExpiredLink() {
         String originalUrl = "https://vk.com/amasovich";
@@ -89,6 +111,4 @@ public class ShortLinkServiceTest {
         assertTrue(notifications.stream().anyMatch(msg -> msg.contains("превысила лимит переходов")),
                 "Одно из уведомлений должно содержать текст о превышении лимита переходов.");
     }
-
-
 }
