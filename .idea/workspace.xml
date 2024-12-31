@@ -4,16 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Work all methods version!">
+    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Debugging the code &amp; DOC">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/Config.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLink.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkConsoleApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkConsoleApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/beryoza/urlshortener/ShortLinkServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/beryoza/urlshortener/ShortLinkServiceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -296,7 +292,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735636622087</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Debugging the code &amp; DOC">
+      <option name="closed" value="true" />
+      <created>1735638767150</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1735638767150</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -311,7 +315,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add Maven config (pom.xml), .gitignore, and base project structure" />
     <MESSAGE value="add Maven config (pom.xml), .gitignore, and base project structure(2)" />
     <MESSAGE value="add url https://github.com/amasovich/url-shortener" />
     <MESSAGE value="Push" />
@@ -336,6 +339,7 @@
     <MESSAGE value="Create ShortLinkConsoleApp" />
     <MESSAGE value="Edite methods and console app" />
     <MESSAGE value="Work all methods version!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Work all methods version!" />
+    <MESSAGE value="Debugging the code &amp; DOC" />
+    <option name="LAST_COMMIT_MESSAGE" value="Debugging the code &amp; DOC" />
   </component>
 </project>

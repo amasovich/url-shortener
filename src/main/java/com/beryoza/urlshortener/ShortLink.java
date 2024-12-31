@@ -41,6 +41,7 @@ public class ShortLink {
      * Пустой конструктор - на всякий случай, если понадобится
      * безаргументное создание (пример: сериализация).
      */
+    @SuppressWarnings("unused")
     public ShortLink() {
     }
 
@@ -76,34 +77,9 @@ public class ShortLink {
         return shortId;
     }
 
-    /** Устанавливает короткий идентификатор. */
-    public void setShortId(String shortId) {
-        this.shortId = shortId;
-    }
-
     /** Возвращает исходный (длинный) URL. */
     public String getOriginalUrl() {
         return originalUrl;
-    }
-
-    /** Устанавливает исходный (длинный) URL. */
-    public void setOriginalUrl(String originalUrl) {
-        this.originalUrl = originalUrl;
-    }
-
-    /**
-     * Время создания (в мс). System.currentTimeMillis() на момент создания.
-     */
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    /**
-     * Устанавливает время создания.
-     * Можно задавать вручную, если восстанавливаем ссылку из БД, или при тестах.
-     */
-    public void setCreatedAt(long createdAt) {
-        this.createdAt = createdAt;
     }
 
     /**
@@ -144,15 +120,6 @@ public class ShortLink {
     /** UUID пользователя, которому принадлежит ссылка. */
     public UUID getUserUuid() {
         return userUuid;
-    }
-
-    /**
-     * Устанавливает UUID владельца.
-     * Менять обычно не нужно,
-     * но может пригодиться, если переносим ссылку другому пользователю (по идее, не по ТЗ).
-     */
-    public void setUserUuid(UUID userUuid) {
-        this.userUuid = userUuid;
     }
 
     /**

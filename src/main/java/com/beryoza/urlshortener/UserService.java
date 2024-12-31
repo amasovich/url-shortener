@@ -80,8 +80,4 @@ public class UserService {
         userRepository.deleteUser(uuid);
         System.out.println("Пользователь с UUID " + uuid + " успешно удалён.");
     }
-
-
-
-
 }

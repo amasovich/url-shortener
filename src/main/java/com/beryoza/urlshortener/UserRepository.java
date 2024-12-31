@@ -51,6 +51,7 @@ public class UserRepository {
      *
      * @return коллекция User из внутреннего хранилища
      */
+    @SuppressWarnings("unused")
     public Collection<User> findAll() {
         return storage.values();
     }

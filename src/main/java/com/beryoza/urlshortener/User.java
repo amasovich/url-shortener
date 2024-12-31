@@ -24,6 +24,7 @@ public class User {
      * Пустой конструктор на всякий случай: пригодится,
      * если вдруг потребуется безаргументное создание
      */
+    @SuppressWarnings("unused")
     public User() {
     }
 
@@ -48,6 +49,7 @@ public class User {
     /**
      * Позволяет установить новый UUID (обычно не требуется менять).
      */
+    @SuppressWarnings("unused")
     public void setUserUuid(UUID userUuid) {
         this.userUuid = userUuid;
     }
@@ -62,6 +64,7 @@ public class User {
     /**
      * Устанавливает имя пользователя (если хотим его переименовать).
      */
+    @SuppressWarnings("unused")
     public void setUserName(String name) {
         this.name = name;
     }
