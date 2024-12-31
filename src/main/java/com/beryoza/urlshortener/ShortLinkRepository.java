@@ -18,11 +18,9 @@ public class ShortLinkRepository {
      * Сохраняем/обновляем короткую ссылку в хранилище.
      *
      * @param link объект ShortLink, где shortId должен быть уникальным
-     * @return тот же link (просто возвращаем для удобства)
      */
-    public ShortLink save(ShortLink link) {
+    public void save(ShortLink link) {
         storage.put(link.getShortId(), link);
-        return link;
     }
 
     /**

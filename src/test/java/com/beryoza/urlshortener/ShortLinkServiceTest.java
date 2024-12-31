@@ -22,7 +22,7 @@ public class ShortLinkServiceTest {
 
     @Test
     public void testUniqueShortLinksForDifferentUsers() {
-        String originalUrl = "http://example.com";
+        String originalUrl = "https://vk.com/amasovich";
         UUID user1 = UUID.randomUUID();
         UUID user2 = UUID.randomUUID();
 
@@ -34,7 +34,7 @@ public class ShortLinkServiceTest {
 
     @Test
     public void testLimitExceedBlocksLink() {
-        String originalUrl = "http://example.com";
+        String originalUrl = "https://vk.com/amasovich";
         UUID user = UUID.randomUUID();
         String shortId = shortLinkService.createShortLink(originalUrl, user, 24, 2);
 
@@ -50,7 +50,7 @@ public class ShortLinkServiceTest {
 
     @Test
     public void testExpiryTimeRemovesLink() {
-        String originalUrl = "http://example.com";
+        String originalUrl = "https://vk.com/amasovich";
         UUID user = UUID.randomUUID();
 
         String shortId = shortLinkService.createShortLink(originalUrl, user, 1, 10); // TTL = 1 час
@@ -68,7 +68,7 @@ public class ShortLinkServiceTest {
 
     @Test
     public void testNotificationOnBlockedOrExpiredLink() {
-        String originalUrl = "http://example.com";
+        String originalUrl = "https://vk.com/amasovich";
         UUID user = UUID.randomUUID();
 
         // Создаём ссылку с лимитом = 1

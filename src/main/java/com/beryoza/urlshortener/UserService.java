@@ -27,8 +27,7 @@ public class UserService {
      * @param name имя пользователя
      */
     public void createUser(String name) {
-        User user = new User(UUID.randomUUID(), name);
-        userRepository.saveUser(user);
+        User user = userRepository.saveUser(new User(UUID.randomUUID(), name));
         System.out.println("Пользователь зарегистрирован. Ваш UUID: " + user.getUserUuid());
     }
 

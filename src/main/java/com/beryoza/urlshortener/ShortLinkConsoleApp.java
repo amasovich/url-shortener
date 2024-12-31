@@ -172,4 +172,6 @@ public class ShortLinkConsoleApp {
         System.out.println("Текущий пользователь: " + user.getUserName() + " (UUID: " + user.getUserUuid() + ")");
     }
 
+
+
 }
