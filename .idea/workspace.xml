@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Debugging the code &amp; DOC">
+    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Edit DOCs code">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLink.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -300,7 +297,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735638767150</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Edit DOCs code">
+      <option name="closed" value="true" />
+      <created>1735639556185</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1735639556185</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -315,7 +320,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="add Maven config (pom.xml), .gitignore, and base project structure(2)" />
     <MESSAGE value="add url https://github.com/amasovich/url-shortener" />
     <MESSAGE value="Push" />
     <MESSAGE value="Create README.MD" />
@@ -340,6 +344,7 @@
     <MESSAGE value="Edite methods and console app" />
     <MESSAGE value="Work all methods version!" />
     <MESSAGE value="Debugging the code &amp; DOC" />
-    <option name="LAST_COMMIT_MESSAGE" value="Debugging the code &amp; DOC" />
+    <MESSAGE value="Edit DOCs code" />
+    <option name="LAST_COMMIT_MESSAGE" value="Edit DOCs code" />
   </component>
 </project>
