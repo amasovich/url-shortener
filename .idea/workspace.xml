@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Edit README">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Work version 2 Application completed">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -337,7 +336,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735641238902</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="Work version 2 Application completed">
+      <option name="closed" value="true" />
+      <created>1735641935834</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1735641935834</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -352,7 +359,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding a prepared class ShortLink" />
     <MESSAGE value="Adding a prepared class UserRepository" />
     <MESSAGE value="Adding a prepared class ShortLinkRepository" />
     <MESSAGE value="Adding a prepared class UserService" />
@@ -377,6 +383,7 @@
     <MESSAGE value="DOvs for main Application" />
     <MESSAGE value="DOСs for Tests Application" />
     <MESSAGE value="Edit README" />
-    <option name="LAST_COMMIT_MESSAGE" value="Edit README" />
+    <MESSAGE value="Work version 2 Application completed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Work version 2 Application completed" />
   </component>
 </project>
