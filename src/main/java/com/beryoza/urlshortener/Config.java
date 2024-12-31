@@ -16,7 +16,6 @@ public class Config {
             if ("test".equals(env)) {
                 configFileName = "testconfig.properties";
             }
-            System.out.println("Загрузка файла конфигурации: " + configFileName);
             properties.load(Config.class.getClassLoader().getResourceAsStream(configFileName));
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();

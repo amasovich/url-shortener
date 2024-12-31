@@ -92,7 +92,7 @@ public class ShortLink {
     }
 
     /**
-     * Время создания (в мс). Обычно это System.currentTimeMillis() на момент создания.
+     * Время создания (в мс). System.currentTimeMillis() на момент создания.
      */
     public long getCreatedAt() {
         return createdAt;

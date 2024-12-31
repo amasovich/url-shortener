@@ -1,6 +1,7 @@
 package com.beryoza.urlshortener;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Сервис для управления пользователями.
@@ -21,23 +22,29 @@ public class UserService {
 
     /**
      * Создаёт нового пользователя.
-     * Генерирует UUID и сохраняет пользователя в репозитории.
+     * Генерирует UUID, сохраняет пользователя в репозитории и выводит сообщение.
      *
-     * @param name имя пользователя (опционально)
-     * @return созданный пользователь
+     * @param name имя пользователя
      */
-    public User createUser(String name) {
+    public void createUser(String name) {
         User user = new User(UUID.randomUUID(), name);
-        return userRepository.saveUser(user);
+        userRepository.saveUser(user);
+        System.out.println("Пользователь зарегистрирован. Ваш UUID: " + user.getUserUuid());
     }
 
-    // Метод авторизации пользователя. Возвращает объект User, если пользователь существует.
-    public User loginUser(UUID uuid) {
+    /**
+     * Метод авторизации пользователя. Устанавливает текущего пользователя.
+     *
+     * @param uuid           UUID пользователя
+     * @param setCurrentUser Consumer для установки текущего пользователя
+     */
+    public void loginUser(UUID uuid, Consumer<UUID> setCurrentUser) {
         User user = userRepository.findUser(uuid);
         if (user == null) {
             throw new IllegalArgumentException("Пользователь с таким UUID не найден.");
         }
-        return user;
+        setCurrentUser.accept(uuid); // Устанавливаем текущего пользователя
+        System.out.println("Успешный вход. Добро пожаловать, " + user.getUserName() + "!");
     }
 
     /**
@@ -56,13 +63,26 @@ public class UserService {
 
     /**
      * Удаляет пользователя по его UUID.
-     * Если пользователя с таким UUID нет, ничего не происходит.
      *
      * @param uuid идентификатор пользователя
+     * @param currentUserUUID UUID текущего пользователя
+     * @throws IllegalArgumentException если пользователь не найден или если пользователь пытается удалить сам себя
      */
-    public void deleteUser(UUID uuid) {
+    public void deleteUser(UUID uuid, UUID currentUserUUID) {
+        if (currentUserUUID != null && currentUserUUID.equals(uuid)) {
+            throw new IllegalArgumentException("Вы не можете удалить текущего авторизованного пользователя. Сначала выйдите из системы.");
+        }
+
+        User user = userRepository.findUser(uuid);
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с таким UUID не найден.");
+        }
+
         userRepository.deleteUser(uuid);
+        System.out.println("Пользователь с UUID " + uuid + " успешно удалён.");
     }
+
+
 
 
 }

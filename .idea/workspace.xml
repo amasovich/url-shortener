@@ -4,12 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Create ShortLinkConsoleApp">
+    <list default="true" id="2d100db8-987d-43b6-807c-7d3c3a34bd05" name="Changes" comment="Edite methods and console app">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLink.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLink.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkConsoleApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkConsoleApp.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/ShortLinkService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/beryoza/urlshortener/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -277,7 +277,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735627210729</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Edite methods and console app">
+      <option name="closed" value="true" />
+      <created>1735631461527</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1735631461527</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -315,6 +323,7 @@
     <MESSAGE value="testExpiryTimeRemovesLink &amp; testUniqueShortLinksForDifferentUsers tests complited" />
     <MESSAGE value="All tests passed" />
     <MESSAGE value="Create ShortLinkConsoleApp" />
-    <option name="LAST_COMMIT_MESSAGE" value="Create ShortLinkConsoleApp" />
+    <MESSAGE value="Edite methods and console app" />
+    <option name="LAST_COMMIT_MESSAGE" value="Edite methods and console app" />
   </component>
 </project>

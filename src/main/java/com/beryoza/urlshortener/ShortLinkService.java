@@ -71,13 +71,7 @@ public class ShortLinkService {
         String shortId = generateShortId();
 
         // Рассчитать время истечения ссылки
-        //long expiryTime = System.currentTimeMillis() + (finalTtl * 3600000L);
         long expiryTime = System.currentTimeMillis() + Math.max(1, finalTtl * 3600000L);
-
-        // Логгирование
-        System.out.println("Создаётся ссылка с shortId: " + shortId);
-        System.out.println("TTL: " + finalTtl + " часов, лимит: " + finalLimit);
-        System.out.println("Время истечения: " + expiryTime);
 
         // Создать объект ShortLink
         ShortLink link = new ShortLink(
@@ -92,6 +86,8 @@ public class ShortLinkService {
 
         // Сохранить ссылку в репозитории
         shortLinkRepository.save(link);
+
+        System.out.println("Ссылка создана: " + shortId + "\nВремя жизни: " + finalTtl + " часов, Лимит переходов: " + finalLimit);
 
         // Возвратить shortId
         return shortId;
@@ -160,25 +156,31 @@ public class ShortLinkService {
      * @throws RuntimeException если ссылка не найдена, пользователь не имеет доступа или новый лимит недопустим
      */
     public void editRedirectLimit(String shortId, int newLimit, UUID userUuid) {
+        // Проверяем входные данные
+        if (shortId == null || shortId.isEmpty()) {
+            throw new IllegalArgumentException("Идентификатор ссылки не может быть пустым");
+        }
+        if (userUuid == null) {
+            throw new IllegalArgumentException("UUID пользователя не может быть null");
+        }
+
         // Ищем ссылку в репозитории
         ShortLink link = shortLinkRepository.findByShortId(shortId);
 
         // Если ссылка не найдена, бросаем исключение
         if (link == null) {
-            notifyUser("Ссылка с идентификатором " + shortId + " не найдена.");
-            throw new RuntimeException("Короткая ссылка не найдена");
+            throw new RuntimeException("Ссылка с идентификатором " + shortId + " не найдена.");
         }
 
         // Проверяем права доступа
         if (!link.getUserUuid().equals(userUuid)) {
-            notifyUser("Пользователь с UUID " + userUuid + " не имеет прав на изменение ссылки с идентификатором " + shortId + ".");
-            throw new RuntimeException("Нет доступа к изменению лимита переходов");
+            throw new RuntimeException("Пользователь с UUID " + userUuid + " не имеет прав на изменение ссылки " + shortId + ".");
         }
 
         // Проверяем новый лимит на соответствие системным ограничениям
         int adjustedLimit = Math.min(Config.getMaxLimit(), Math.max(Config.getMinLimit(), newLimit));
         if (adjustedLimit != newLimit) {
-            notifyUser("Указанный лимит " + newLimit + " был скорректирован до " + adjustedLimit + " в соответствии с системными ограничениями.");
+            notifyUser("Лимит " + newLimit + " был скорректирован до " + adjustedLimit + " в соответствии с системными ограничениями.");
         }
 
         // Устанавливаем новый лимит
@@ -188,7 +190,7 @@ public class ShortLinkService {
         shortLinkRepository.save(link);
 
         // Уведомляем пользователя об успешном изменении
-        notifyUser("Лимит переходов для ссылки с идентификатором " + shortId + " успешно изменён на " + adjustedLimit + ".");
+        notifyUser("Лимит переходов для ссылки " + shortId + " успешно изменён на " + adjustedLimit + ".");
     }
 
     /**
@@ -200,39 +202,41 @@ public class ShortLinkService {
      * @throws RuntimeException если ссылка не найдена, пользователь не имеет прав или новый срок недопустим
      */
     public void editExpiryTime(String shortId, int newTTL, UUID userUuid) {
+        // Проверяем входные данные
+        if (shortId == null || shortId.isEmpty()) {
+            throw new IllegalArgumentException("Идентификатор ссылки не может быть пустым");
+        }
+        if (userUuid == null) {
+            throw new IllegalArgumentException("UUID пользователя не может быть null");
+        }
+
         // Ищем ссылку в репозитории
         ShortLink link = shortLinkRepository.findByShortId(shortId);
 
         // Если ссылка не найдена, бросаем исключение
         if (link == null) {
-            notifyUser("Ссылка с идентификатором " + shortId + " не найдена.");
-            throw new RuntimeException("Короткая ссылка не найдена");
+            throw new RuntimeException("Ссылка с идентификатором " + shortId + " не найдена.");
         }
 
         // Проверяем права доступа
         if (!link.getUserUuid().equals(userUuid)) {
-            notifyUser("Пользователь с UUID " + userUuid + " не имеет прав на изменение ссылки с идентификатором " + shortId + ".");
-            throw new RuntimeException("Нет доступа к изменению времени жизни ссылки");
+            throw new RuntimeException("Пользователь с UUID " + userUuid + " не имеет прав на изменение ссылки " + shortId + ".");
         }
 
-        // Получаем системные ограничения
-        int maxTTL = Config.getMaxTtl();
-        int minTTL = Config.getMinTtl();
-
-        // Проверяем новый срок действия
-        int adjustedTTL = Math.min(maxTTL, Math.max(minTTL, newTTL));
+        // Проверяем новый срок действия на соответствие ограничениям
+        int adjustedTTL = Math.min(Config.getMaxTtl(), Math.max(Config.getMinTtl(), newTTL));
         if (adjustedTTL != newTTL) {
-            notifyUser("Указанный срок действия " + newTTL + " часов был скорректирован до " + adjustedTTL + " в соответствии с системными ограничениями (" + minTTL + "-" + maxTTL + " часов).");
+            notifyUser("Срок действия " + newTTL + " часов был скорректирован до " + adjustedTTL + ".");
         }
 
         // Устанавливаем новый срок действия
         link.setExpiryTime(System.currentTimeMillis() + adjustedTTL * 3600000L);
 
-        // Сохраняем обновлённую ссылку в репозитории
+        // Сохраняем обновлённую ссылку
         shortLinkRepository.save(link);
 
         // Уведомляем пользователя об успешном изменении
-        notifyUser("Время жизни ссылки с идентификатором " + shortId + " успешно изменено на " + adjustedTTL + " часов.");
+        notifyUser("Время жизни ссылки " + shortId + " успешно изменено на " + adjustedTTL + " часов.");
     }
 
     /**
@@ -277,9 +281,8 @@ public class ShortLinkService {
      * или превышен лимит переходов. Если указан UUID пользователя, очищаются только его ссылки.
      *
      * @param userUuid UUID пользователя (если null, очищаются все ссылки)
-     * @return количество удалённых ссылок
      */
-    public int cleanUpExpiredLinks(UUID userUuid) {
+    public void cleanUpExpiredLinks(UUID userUuid) {
         // Преобразуем коллекцию в список
         List<ShortLink> allLinks = new ArrayList<>(shortLinkRepository.findAll());
         long currentTime = System.currentTimeMillis();
@@ -303,11 +306,16 @@ public class ShortLinkService {
             }
         }
 
-        return removedCount;
+        // Вывод итогового сообщения
+        if (removedCount > 0) {
+            System.out.println("Очистка завершена. Удалено " + removedCount + " устаревших ссылок.");
+        } else {
+            System.out.println("Очистка завершена. Устаревших ссылок не найдено.");
+        }
     }
 
-    public int cleanUpExpiredLinks() {
-        return cleanUpExpiredLinks(null); // Очистка всех ссылок
+   public void cleanUpExpiredLinks() {
+        cleanUpExpiredLinks(null); // Очистка всех ссылок
     }
 
     /**
@@ -320,8 +328,8 @@ public class ShortLinkService {
         StringBuilder shortId = new StringBuilder();
         Random random = new Random();
 
-        // Генерируем строку длиной 8 символов
-        for (int i = 0; i < 8; i++) {
+        // Генерируем строку длиной 6 символов
+        for (int i = 0; i < 6; i++) {
             shortId.append(chars.charAt(random.nextInt(chars.length())));
         }
 
@@ -379,15 +387,36 @@ public class ShortLinkService {
         }
     }
 
-    public List<ShortLink> getUserLinks(UUID userUuid) {
+    /**
+     * Получает ссылки пользователя и, при необходимости, выводит их.
+     *
+     * @param userUuid   UUID пользователя
+     * @param printLinks Если true, ссылки будут выведены в консоль
+     */
+    public void getUserLinks(UUID userUuid, boolean printLinks) {
         List<ShortLink> userLinks = new ArrayList<>();
         for (ShortLink link : shortLinkRepository.findAll()) {
             if (link.getUserUuid().equals(userUuid)) {
                 userLinks.add(link);
             }
         }
-        return userLinks;
+
+        if (printLinks) {
+            if (userLinks.isEmpty()) {
+                System.out.println("У вас нет созданных ссылок.");
+            } else {
+                System.out.println("Ваши ссылки:");
+                for (ShortLink link : userLinks) {
+                    System.out.printf("- %s -> %s (лимит: %d, переходов: %d, истекает через: %d часов)%n",
+                            link.getShortId(), link.getOriginalUrl(), link.getLimit(), link.getCurrentCount(),
+                            (link.getExpiryTime() - System.currentTimeMillis()) / 3600000);
+                }
+            }
+        }
+
     }
+
+
 
 
 }
