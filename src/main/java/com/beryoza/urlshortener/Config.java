@@ -1,6 +1,5 @@
 package com.beryoza.urlshortener;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -13,14 +12,15 @@ public class Config {
     static {
         try {
             String env = System.getProperty("env", "default");
-            String configFileName = "config.properties";
+            String configFileName = "application.properties";
             if ("test".equals(env)) {
                 configFileName = "testconfig.properties";
             }
-            // Загружаем файл из classpath
+            System.out.println("Загрузка файла конфигурации: " + configFileName);
             properties.load(Config.class.getClassLoader().getResourceAsStream(configFileName));
         } catch (IOException | NullPointerException e) {
-            throw new RuntimeException("Не удалось загрузить конфигурационный файл", e);
+            e.printStackTrace();
+            throw new RuntimeException("Не удалось загрузить конфигурационный файл: " + e.getMessage(), e);
         }
     }
 

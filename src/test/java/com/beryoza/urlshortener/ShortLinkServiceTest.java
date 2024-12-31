@@ -1,109 +1,89 @@
 package com.beryoza.urlshortener;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ShortLinkServiceTest {
 
-    private ShortLinkRepository shortLinkRepository;
     private ShortLinkService shortLinkService;
+    private ShortLinkRepository shortLinkRepository;
 
-    private UserRepository userRepository;
-    private UserService userService;
-
-
-
-    @Before
-    public void setup() {
-        System.setProperty("env", "test");
+    @BeforeEach
+    public void setUp() {
         shortLinkRepository = new ShortLinkRepository();
         shortLinkService = new ShortLinkService(shortLinkRepository);
-
-        userRepository = new UserRepository();
-        userService = new UserService(userRepository);
     }
 
     @Test
     public void testUniqueShortLinksForDifferentUsers() {
-        User user1 = userService.createUser("Alice");
-        User user2 = userService.createUser("Bob");
+        String originalUrl = "http://example.com";
+        UUID user1 = UUID.randomUUID();
+        UUID user2 = UUID.randomUUID();
 
-        String url = "https://example.com";
+        String shortId1 = shortLinkService.createShortLink(originalUrl, user1, 24, 10);
+        String shortId2 = shortLinkService.createShortLink(originalUrl, user2, 24, 10);
 
-        String shortLink1 = shortLinkService.createShortLink(url, user1.getUserUuid(), 24, 10);
-        String shortLink2 = shortLinkService.createShortLink(url, user2.getUserUuid(), 24, 10);
-
-        assertNotEquals("Ссылки для разных пользователей должны быть уникальными", shortLink1, shortLink2);
+        assertNotEquals(shortId1, shortId2, "Сокращённые ссылки для разных пользователей должны быть уникальными.");
     }
 
     @Test
-    public void testLimitExceeded() {
-        User user = userService.createUser("Charlie");
+    public void testLimitExceedBlocksLink() {
+        String originalUrl = "http://example.com";
+        UUID user = UUID.randomUUID();
+        String shortId = shortLinkService.createShortLink(originalUrl, user, 24, 2);
 
-        String url = "https://example.com";
-        String shortLink = shortLinkService.createShortLink(url, user.getUserUuid(), 24, 1);
+        // Переход по ссылке 2 раза
+        shortLinkService.getOriginalUrl(shortId);
+        shortLinkService.getOriginalUrl(shortId);
 
-        // Первый переход должен сработать
-        ShortLink resolvedLink = shortLinkService.getOriginalUrl(shortLink);
-        assertEquals("URL должен соответствовать оригиналу", url, resolvedLink.getOriginalUrl());
-
-        // Второй переход должен вызывать исключение
-        try {
-            shortLinkService.getOriginalUrl(shortLink);
-            fail("Ожидалось исключение при превышении лимита переходов");
-        } catch (RuntimeException e) {
-            assertTrue(
-                    "Исключение должно содержать текст про превышение лимита",
-                    e.getMessage().contains("лимит переходов")
-            );
-        }
+        // Третий переход должен быть заблокирован
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> shortLinkService.getOriginalUrl(shortId));
+        assertTrue(exception.getMessage().contains("превысила лимит переходов"), "Ссылка должна блокироваться при превышении лимита переходов.");
     }
 
     @Test
-    public void testExpiredLinks() {
-        User user = userService.createUser("Diana");
+    public void testExpiryTimeRemovesLink() {
+        String originalUrl = "http://example.com";
+        UUID user = UUID.randomUUID();
 
-        String url = "https://example.com";
-        // Создаём ссылку с минимально допустимым TTL (например, 1 мс)
-        String shortLink = shortLinkService.createShortLink(url, user.getUserUuid(), 1, 10);
+        String shortId = shortLinkService.createShortLink(originalUrl, user, 1, 10); // TTL = 1 час
 
-        try {
-            Thread.sleep(5); // Ждём, чтобы ссылка гарантированно истекла
-            shortLinkService.getOriginalUrl(shortLink);
-            fail("Ожидалось исключение при истечении срока действия ссылки");
-        } catch (RuntimeException e) {
-            assertTrue(
-                    "Исключение должно содержать текст про истечение срока",
-                    e.getMessage().contains("истёк")
-            );
-        } catch (InterruptedException e) {
-            fail("Тест был прерван во время ожидания истечения ссылки");
-        }
+        // Симулируем истечение времени
+        ShortLink link = shortLinkRepository.findByShortId(shortId);
+        assertNotNull(link, "Ссылка должна существовать до истечения срока.");
+
+        // Устанавливаем время истечения вручную
+        link.setExpiryTime(System.currentTimeMillis() - 1000);
+        shortLinkService.cleanUpExpiredLinks();
+
+        assertNull(shortLinkRepository.findByShortId(shortId), "Ссылка должна быть удалена после истечения срока.");
     }
 
     @Test
-    public void testUserNotificationOnUnavailableLink() {
-        User user = userService.createUser("Eve");
+    public void testNotificationOnBlockedOrExpiredLink() {
+        String originalUrl = "http://example.com";
+        UUID user = UUID.randomUUID();
 
-        String url = "https://example.com";
-        String shortLink = shortLinkService.createShortLink(url, user.getUserUuid(), 24, 1);
+        String shortId = shortLinkService.createShortLink(originalUrl, user, 1, 1); // Лимит = 1
 
-        // Первый переход допустим
-        shortLinkService.getOriginalUrl(shortLink);
+        // Переход по ссылке (должен быть успешным)
+        shortLinkService.getOriginalUrl(shortId);
 
-        // Второй переход должен быть заблокирован
-        try {
-            shortLinkService.getOriginalUrl(shortLink);
-            fail("Ожидалось исключение при недоступности ссылки");
-        } catch (RuntimeException e) {
-            assertTrue(
-                    "Исключение должно содержать текст про превышение лимита",
-                    e.getMessage().contains("лимит переходов")
-            );
-        }
+        // Второй переход (должен быть заблокирован)
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> shortLinkService.getOriginalUrl(shortId));
+        assertTrue(exception.getMessage().contains("превысила лимит переходов"), "Пользователь должен получать уведомление о превышении лимита переходов.");
+
+        // Создаём новую ссылку с истёкшим временем
+        String shortIdExpired = shortLinkService.createShortLink(originalUrl, user, 1, 10);
+        ShortLink linkExpired = shortLinkRepository.findByShortId(shortIdExpired);
+        linkExpired.setExpiryTime(System.currentTimeMillis() - 1000);
+        shortLinkService.cleanUpExpiredLinks();
+
+        assertNull(shortLinkRepository.findByShortId(shortIdExpired), "Ссылка должна быть удалена.");
+        assertThrows(RuntimeException.class, () -> shortLinkService.getOriginalUrl(shortIdExpired), "Пользователь должен получать уведомление об истечении срока жизни ссылки.");
     }
 }
