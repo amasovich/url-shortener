@@ -5,6 +5,8 @@ import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Сервис для управления короткими ссылками.
@@ -18,6 +20,7 @@ public class ShortLinkService {
 
     // Репозиторий для работы с хранилищем коротких ссылок.
     private final ShortLinkRepository shortLinkRepository;
+    private final List<String> notifications; // Для хранения уведомлений
 
     /**
      * Конструктор. Подключает репозиторий коротких ссылок.
@@ -26,6 +29,7 @@ public class ShortLinkService {
      */
     public ShortLinkService(ShortLinkRepository shortLinkRepository) {
         this.shortLinkRepository = shortLinkRepository;
+        this.notifications = new ArrayList<>();
     }
 
     /**
@@ -97,7 +101,6 @@ public class ShortLinkService {
      * @throws RuntimeException если ссылка недоступна или не найдена
      */
     public ShortLink getOriginalUrl(String shortId) {
-
         // Ищем ссылку в репозитории
         ShortLink link = shortLinkRepository.findByShortId(shortId);
 
@@ -124,13 +127,12 @@ public class ShortLinkService {
             throw new RuntimeException("Количество коротких ссылок превысило установленный лимит");
         }
 
-        System.out.println("Очищаем устаревшие ссылки");
-        // Очищаем устаревшие или исчерпанные ссылки
-        cleanUpExpiredLinks();
-
         // Увеличиваем счётчик переходов
         link.setCurrentCount(link.getCurrentCount() + 1);
         System.out.println("Счётчик обновлён: " + link.getCurrentCount());
+
+        // Сохраняем изменения
+        shortLinkRepository.save(link);
 
         // Открываем ссылку в браузере
         openInBrowser(link.getOriginalUrl());
@@ -138,6 +140,7 @@ public class ShortLinkService {
         // Возвращаем найденную ссылку
         return link;
     }
+
 
     /**
      * Удаляет все ссылки, которые больше не должны быть доступны.
@@ -189,7 +192,17 @@ public class ShortLinkService {
      * @param message текст сообщения для вывода в консоль
      */
     private void notifyUser(String message) {
-        System.out.println("Уведомление пользователя: " + message);
+        notifications.add(message); // Добавляем сообщение в список
+        System.out.println("Добавлено уведомление: " + message);
+    }
+
+    public List<String> getNotifications() {
+        System.out.println("Текущие уведомления: " + notifications);
+        return notifications; // Метод для получения уведомлений
+    }
+
+    public void clearNotifications() {
+        notifications.clear();
     }
 
     /**
