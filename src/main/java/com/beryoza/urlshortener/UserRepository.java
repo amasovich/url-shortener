@@ -21,7 +21,7 @@ public class UserRepository {
      * @param user объект пользователя, должен иметь уникальный userUuid
      * @return тот же user (просто возвращаем для удобства)
      */
-    public User save(User user) {
+    public User saveUser(User user) {
         storage.put(user.getUserUuid(), user);
         return user;
     }
@@ -32,7 +32,7 @@ public class UserRepository {
      * @param uuid идентификатор пользователя
      * @return найденный User или null, если такого нет
      */
-    public User findByUuid(UUID uuid) {
+    public User findUser(UUID uuid) {
         return storage.get(uuid);
     }
 
@@ -42,7 +42,7 @@ public class UserRepository {
      *
      * @param uuid идентификатор пользователя
      */
-    public void deleteByUuid(UUID uuid) {
+    public void deleteUser(UUID uuid) {
         storage.remove(uuid);
     }
 

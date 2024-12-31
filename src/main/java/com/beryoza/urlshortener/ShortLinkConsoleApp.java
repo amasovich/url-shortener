@@ -37,31 +37,37 @@ public class ShortLinkConsoleApp {
         try {
             switch (action) {
                 case "register":
-                    register(parts);
+                    registerUser(parts);
                     break;
                 case "login":
-                    login(parts);
+                    loginUser(parts);
                     break;
                 case "shorten":
-                    shorten(parts);
+                    shortenUrl(parts);
                     break;
                 case "list":
-                    list();
+                    listUrl();
                     break;
                 case "delete":
-                    delete(parts);
+                    deleteUrl(parts);
                     break;
                 case "edit-limit":
-                    editLimit(parts);
+                    editLimitUrl(parts);
+                    break;
+                case "edit-expiry":
+                    editExpiryUrl(parts);
                     break;
                 case "goto":
                     gotoLink(parts);
                     break;
                 case "clean":
-                    clean();
+                    cleanUrl();
                     break;
-                case "whoami":
-                    whoami();
+                case "delete-user":
+                    deleteUser(parts);
+                    break;
+                case "whoAmI":
+                    whoAmI();
                     break;
                 default:
                     System.out.println("Неизвестная команда. Введите 'help' для списка доступных команд.");
@@ -79,49 +85,68 @@ public class ShortLinkConsoleApp {
         System.out.println("- list: Просмотр всех ссылок пользователя");
         System.out.println("- delete <shortId>: Удаление ссылки");
         System.out.println("- edit-limit <shortId> <newLimit>: Изменение лимита переходов");
+        System.out.println("- edit-expiry <shortId> <newTTL>: Изменение времени жизни ссылки");
         System.out.println("- goto <shortId>: Переход по ссылке");
         System.out.println("- clean: Удаление устаревших ссылок");
-        System.out.println("- whoami: Показ текущего пользователя");
+        System.out.println("- whoAmI: Показ текущего пользователя");
         System.out.println("- exit: Завершение работы приложения");
     }
 
-    private static void register(String[] parts) {
+    private static void registerUser(String[] parts) {
         if (parts.length < 2) {
             throw new IllegalArgumentException("Введите имя пользователя для регистрации.");
         }
         String name = parts[1];
-        User user = userService.register(name);
-        System.out.println("Пользователь зарегистрирован. Ваш UUID: " + user.getUuid());
+        User user = userService.createUser(name);
+        System.out.println("Пользователь зарегистрирован. Ваш UUID: " + user.getUserUuid());
     }
 
-    private static void login(String[] parts) {
+    private static void loginUser(String[] parts) {
         if (parts.length < 2) {
             throw new IllegalArgumentException("Введите UUID для авторизации.");
         }
         UUID uuid = UUID.fromString(parts[1]);
-        if (userService.login(uuid)) {
-            currentUser = uuid;
-            System.out.println("Успешный вход. Добро пожаловать, " + userService.getUserByUuid(uuid).getName() + "!");
-        } else {
-            throw new IllegalArgumentException("Пользователь с таким UUID не найден.");
-        }
+        User user = userService.loginUser(uuid); // Теперь возвращается объект User
+        currentUser = uuid; // Сохраняем текущего пользователя
+        System.out.println("Успешный вход. Добро пожаловать, " + user.getUserName() + "!");
     }
 
-    private static void shorten(String[] parts) {
+    private static void deleteUser(String[] parts) {
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Введите UUID пользователя для удаления.");
+        }
+        UUID uuid = UUID.fromString(parts[1]);
+        if (currentUser != null && currentUser.equals(uuid)) {
+            System.out.println("Вы не можете удалить текущего авторизованного пользователя. Сначала выйдите из системы.");
+            return;
+        }
+        if (userService.getUser(uuid) == null) {
+            System.out.println("Пользователь с таким UUID не найден.");
+            return;
+        }
+        userService.deleteUser(uuid);
+        System.out.println("Пользователь с UUID " + uuid + " успешно удалён.");
+    }
+
+    private static void shortenUrl(String[] parts) {
         if (currentUser == null) {
             throw new IllegalStateException("Необходимо авторизоваться для выполнения команды.");
         }
-        if (parts.length < 4) {
-            throw new IllegalArgumentException("Введите URL, время жизни (в часах) и лимит переходов.");
+        if (parts.length < 2) {
+            throw new IllegalArgumentException("Введите URL.");
         }
+
         String url = parts[1];
-        int ttlHours = Integer.parseInt(parts[2]);
-        int limit = Integer.parseInt(parts[3]);
+
+        // Берём время жизни (TTL) и лимит из конфигурации
+        int ttlHours = Config.getMaxTtl(); // Используем максимальный TTL из конфигурации
+        int limit = Config.getMaxLimit(); // Используем максимальный лимит из конфигурации
+
         String shortId = shortLinkService.createShortLink(url, currentUser, ttlHours, limit);
-        System.out.println("Ссылка создана: " + shortId);
+        System.out.println("Ссылка создана: " + shortId + "\nВремя жизни: " + ttlHours + " часов, Лимит переходов: " + limit);
     }
 
-    private static void list() {
+    private static void listUrl() {
         if (currentUser == null) {
             throw new IllegalStateException("Необходимо авторизоваться для выполнения команды.");
         }
@@ -138,7 +163,7 @@ public class ShortLinkConsoleApp {
         }
     }
 
-    private static void delete(String[] parts) {
+    private static void deleteUrl(String[] parts) {
         if (currentUser == null) {
             throw new IllegalStateException("Необходимо авторизоваться для выполнения команды.");
         }
@@ -150,7 +175,7 @@ public class ShortLinkConsoleApp {
         System.out.println("Ссылка " + shortId + " успешно удалена.");
     }
 
-    private static void editLimit(String[] parts) {
+    private static void editLimitUrl(String[] parts) {
         if (currentUser == null) {
             throw new IllegalStateException("Необходимо авторизоваться для выполнения команды.");
         }
@@ -163,20 +188,29 @@ public class ShortLinkConsoleApp {
         System.out.println("Лимит успешно изменён на " + newLimit + ".");
     }
 
+    private static void editExpiryUrl(String[] parts) {
+        if (currentUser == null) {
+            throw new IllegalStateException("Необходимо авторизоваться для выполнения команды.");
+        }
+        if (parts.length < 3) {
+            throw new IllegalArgumentException("Введите идентификатор ссылки и новое время жизни (в часах).");
+        }
+        String shortId = parts[1];
+        int newTTL = Integer.parseInt(parts[2]);
+        shortLinkService.editExpiryTime(shortId, newTTL, currentUser);
+        System.out.println("Время жизни ссылки " + shortId + " успешно изменено на " + newTTL + " часов.");
+    }
+
     private static void gotoLink(String[] parts) {
         if (parts.length < 2) {
             throw new IllegalArgumentException("Введите идентификатор короткой ссылки.");
         }
         String shortId = parts[1];
-        try {
-            ShortLink link = shortLinkService.getOriginalUrl(shortId);
-            Desktop.getDesktop().browse(new URI(link.getOriginalUrl()));
-        } catch (Exception e) {
-            System.out.println("Ошибка при открытии ссылки: " + e.getMessage());
-        }
+        ShortLink link = shortLinkService.getOriginalUrl(shortId);
+        shortLinkService.openInBrowser(link.getOriginalUrl());
     }
 
-    private static void clean() {
+    private static void cleanUrl() {
         if (currentUser == null) {
             throw new IllegalStateException("Необходимо авторизоваться для выполнения команды.");
         }
@@ -184,12 +218,12 @@ public class ShortLinkConsoleApp {
         System.out.println("Очистка завершена. Удалено " + cleanedCount + " устаревших ссылок.");
     }
 
-    private static void whoami() {
+    private static void whoAmI() {
         if (currentUser == null) {
             System.out.println("Вы не авторизованы.");
         } else {
-            User user = userService.getUserByUuid(currentUser);
-            System.out.println("Текущий пользователь: " + user.getName() + " (UUID: " + user.getUuid() + ")");
+            User user = userService.getUser(currentUser);
+            System.out.println("Текущий пользователь: " + user.getUserName() + " (UUID: " + user.getUserUuid() + ")");
         }
     }
 }

@@ -55,14 +55,14 @@ public class User {
     /**
      * Возвращает имя пользователя (если задано).
      */
-    public String getName() {
+    public String getUserName() {
         return name;
     }
 
     /**
      * Устанавливает имя пользователя (если хотим его переименовать).
      */
-    public void setName(String name) {
+    public void setUserName(String name) {
         this.name = name;
     }
 

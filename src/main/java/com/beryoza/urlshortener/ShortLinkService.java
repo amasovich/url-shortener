@@ -274,14 +274,24 @@ public class ShortLinkService {
      * Удаляет устаревшие ссылки.
      *
      * Метод проверяет все ссылки в репозитории и удаляет те, у которых истёк срок действия
-     * или превышен лимит переходов.
+     * или превышен лимит переходов. Если указан UUID пользователя, очищаются только его ссылки.
+     *
+     * @param userUuid UUID пользователя (если null, очищаются все ссылки)
+     * @return количество удалённых ссылок
      */
-    public void cleanUpExpiredLinks() {
+    public int cleanUpExpiredLinks(UUID userUuid) {
         // Преобразуем коллекцию в список
         List<ShortLink> allLinks = new ArrayList<>(shortLinkRepository.findAll());
         long currentTime = System.currentTimeMillis();
+        int removedCount = 0;
 
         for (ShortLink link : allLinks) {
+            // Проверяем принадлежность пользователя (если указан UUID)
+            if (userUuid != null && !link.getUserUuid().equals(userUuid)) {
+                continue; // Пропускаем ссылки других пользователей
+            }
+
+            // Проверяем срок действия и лимит переходов
             if (currentTime > link.getExpiryTime() || link.getCurrentCount() >= link.getLimit()) {
                 // Уведомляем пользователя об удалении
                 notifyUser("Удалена ссылка с идентификатором " + link.getShortId() +
@@ -289,8 +299,15 @@ public class ShortLinkService {
 
                 // Удаляем ссылку
                 shortLinkRepository.deleteByShortId(link.getShortId());
+                removedCount++;
             }
         }
+
+        return removedCount;
+    }
+
+    public int cleanUpExpiredLinks() {
+        return cleanUpExpiredLinks(null); // Очистка всех ссылок
     }
 
     /**
@@ -349,7 +366,7 @@ public class ShortLinkService {
      *
      * @param url оригинальная ссылка для открытия
      */
-    private void openInBrowser(String url) {
+    void openInBrowser(String url) {
         if (Desktop.isDesktopSupported()) {
             try {
                 Desktop.getDesktop().browse(new URI(url));
@@ -361,4 +378,16 @@ public class ShortLinkService {
             System.err.println("Операция Desktop не поддерживается на данной системе.");
         }
     }
+
+    public List<ShortLink> getUserLinks(UUID userUuid) {
+        List<ShortLink> userLinks = new ArrayList<>();
+        for (ShortLink link : shortLinkRepository.findAll()) {
+            if (link.getUserUuid().equals(userUuid)) {
+                userLinks.add(link);
+            }
+        }
+        return userLinks;
+    }
+
+
 }

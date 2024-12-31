@@ -28,7 +28,16 @@ public class UserService {
      */
     public User createUser(String name) {
         User user = new User(UUID.randomUUID(), name);
-        return userRepository.save(user);
+        return userRepository.saveUser(user);
+    }
+
+    // Метод авторизации пользователя. Возвращает объект User, если пользователь существует.
+    public User loginUser(UUID uuid) {
+        User user = userRepository.findUser(uuid);
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с таким UUID не найден.");
+        }
+        return user;
     }
 
     /**
@@ -38,7 +47,11 @@ public class UserService {
      * @return объект User, если найден, иначе null
      */
     public User getUser(UUID uuid) {
-        return userRepository.findByUuid(uuid);
+        User user = userRepository.findUser(uuid);
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с UUID " + uuid + " не найден.");
+        }
+        return user;
     }
 
     /**
@@ -48,6 +61,8 @@ public class UserService {
      * @param uuid идентификатор пользователя
      */
     public void deleteUser(UUID uuid) {
-        userRepository.deleteByUuid(uuid);
+        userRepository.deleteUser(uuid);
     }
+
+
 }
